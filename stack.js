@@ -71,6 +71,7 @@ class Stack {
         while(idx < str.length) {   
             let num = ""
             if(idx<str.length && ["+", "-"].includes(str[idx]) && (idx===0 || arrConverter[arrConverter.length - 1] === "(" || typeof arrConverter[arrConverter.length - 1] !== "number") && arrConverter[arrConverter.length - 1] !== "!"){
+                let flag = false
                 let neg = str[idx]==="+" ? 1 : -1
                 // console.log(neg);
                 idx++
@@ -79,6 +80,9 @@ class Stack {
                     idx++
                 }
                 while(idx<str.length && this.#isNumber(str[idx])){
+                    console.log(flag);
+                    if(str[idx] === "." && !flag) flag = true
+                    else throw new Error("Multiple decimal point not allowed")
                     num += str[idx]
                     idx++;
                 }
@@ -88,7 +92,10 @@ class Stack {
                 num = ""
             }
             if (idx<str.length && this.#isNumber(str[idx])) {
+                let flag = false 
                 while (idx < str.length && this.#isNumber(str[idx])) {
+                    if(str[idx]==="." && !flag) flag = true
+                    else throw new Error("Multiple decimal point not allowed")
                     num += str[idx];
                     idx++;
                 }
