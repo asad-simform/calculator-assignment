@@ -203,6 +203,46 @@ class Stack {
         return this.stack
     }
 
+    toggleSign(arr) {
+        let paran = -1
+        let start = -1, end = -1
+        let idx = arr.length - 1
+        if(arr.length === 0) return "Can't perform operation";
+        if(typeof arr[arr.length - 1] === "number") {
+            arr[arr.length - 1] = -1 * arr[arr.length - 1]
+        } else {
+            while(idx>=0) {
+                if(arr[idx] === ")") {
+                    paran = 1
+                    end = idx
+                    idx--
+                    break
+                }
+                idx--
+            }
+            while(idx>=0) {
+                if(arr[idx] === ")") paran++
+                if(arr[idx] === "(") paran--
+                if(paran === 0) {
+                    start = idx 
+                    console.log(start);
+                    
+                    break
+                }
+                console.log(paran, start, arr[idx]);
+                idx--
+                
+            }
+            if(start !== -1) {
+                arr[start] = "-("
+            }
+            // if(paran === 0) start = idx+1 
+            // console.log(arr[start], arr[end], start, end, idx);
+            
+        }
+        return arr
+    }
+
 }
 
 
