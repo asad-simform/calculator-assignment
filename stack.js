@@ -22,6 +22,8 @@ class Stack {
     }
 
     #scientificOperator(op, val) {
+        // console.log(Math.cos(val));
+        
         switch(op) {
             case "sin": 
                 return Math.sin(val)
@@ -61,14 +63,16 @@ class Stack {
     }
 
     arrConvert(str) {
-        this.stack = []
+        console.log(str);
+        
+        let arrConverter = []
         let idx = 0
         let open = 0, close = 0;
-        while(idx < str.length) {
+        while(idx < str.length) {   
             let num = ""
-            if(idx<str.length && ["+", "-"].includes(str[idx]) && (idx===0 || this.stack[this.stack.length - 1] === "(" || typeof this.stack[this.stack.length - 1] !== "number") && this.stack[this.stack.length - 1] !== "!"){
+            if(idx<str.length && ["+", "-"].includes(str[idx]) && (idx===0 || arrConverter[arrConverter.length - 1] === "(" || typeof arrConverter[arrConverter.length - 1] !== "number") && arrConverter[arrConverter.length - 1] !== "!"){
                 let neg = str[idx]==="+" ? 1 : -1
-                console.log(neg);
+                // console.log(neg);
                 idx++
                 while(idx<str.length && !this.#isNumber(str[idx]) && ["+", "-"].includes(str[idx])) {
                     if(str[idx] === "-") neg *= -1
@@ -78,9 +82,9 @@ class Stack {
                     num += str[idx]
                     idx++;
                 }
-                if(this.stack.length>0 && (this.stack[this.stack.length - 1] === ")" || this.stack[this.stack.length - 1] === Math.PI || this.stack[this.stack.length - 1] === Math.E )) this.stack.push("*")
-                if(num==="") this.stack.push(neg)
-                else this.stack.push(neg * Number(num))
+                if(arrConverter.length>0 && (arrConverter[arrConverter.length - 1] === ")" || arrConverter[arrConverter.length - 1] === Math.PI || arrConverter[arrConverter.length - 1] === Math.E )) arrConverter.push("*")
+                if(num==="") arrConverter.push(neg)
+                else arrConverter.push(neg * Number(num))
                 num = ""
             }
             if (idx<str.length && this.#isNumber(str[idx])) {
@@ -89,8 +93,8 @@ class Stack {
                     idx++;
                 }
                 if(num!=="") {
-                    if(this.stack.length>0 && (this.stack[this.stack.length - 1] === ")" || this.stack[this.stack.length - 1] === Math.PI || this.stack[this.stack.length - 1] === Math.E )) this.stack.push("*")
-                    this.stack.push(Number(num));
+                    if(arrConverter.length>0 && (arrConverter[arrConverter.length - 1] === ")" || arrConverter[arrConverter.length - 1] === Math.PI || arrConverter[arrConverter.length - 1] === Math.E )) arrConverter.push("*")
+                    arrConverter.push(Number(num));
                 }
                 num = ""
             }
@@ -99,40 +103,73 @@ class Stack {
                 idx++;
             }
             if(this.scientificArr.includes(num)) {
+                // console.log(idx);
+                
                 let evl = ""
-                while(idx+1<str.length && str[idx+1] !== ")") {
-                    evl += str[idx+1]
+                let paran = -1
+                let start = -1, end = -1
+                while(idx<str.length) {
+                    if(str[idx]==="(") {
+                        paran = 1
+                        end = idx
+                        idx++
+                        break
+                    }
                     idx++
                 }
-                if(this.stack.length > 0 && (typeof this.stack[this.stack.length - 1] === "number")) this.stack.push("*")
-                this.stack.push(this.#scientificOperator(num, eval(evl)))
+                while(idx<str.length) {
+                    if(str[idx] === "(") paran++
+                    if(str[idx] === ")") paran--
+                    if(paran === 0) {
+                        start = idx 
+                        break
+                    }
+                    evl += str[idx]
+                    idx++
+                }
+                console.log(evl);
+                
+                // while(idx+1<str.length && str[idx+1] !== ")") {
+                //     evl += str[idx+1]
+                //     idx++
+                // }
+                if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number")) arrConverter.push("*")
+                let number = this.evaluatePostfix(this.postfix(this.arrConvert(evl)))
+                    let result = this.#scientificOperator(num, number)
+                // console.log(result);
+                // console.log(number);
+                console.log(arrConverter);
+                
+                arrConverter.push(result)
                 num = ""
                 idx+=2
             }
             if(idx<str.length && str[idx] === "π") {
-                if(this.stack.length > 0 && (typeof this.stack[this.stack.length - 1] === "number")) this.stack.push("*")
-                this.stack.push(Math.PI)
+                if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number")) arrConverter.push("*")
+                arrConverter.push(Math.PI)
                 idx++
             }
             if(idx<str.length && str[idx] === "ℯ") {
-                if(this.stack.length > 0 && (typeof this.stack[this.stack.length - 1] === "number")) this.stack.push("*")
-                this.stack.push(Math.E)
+                if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number")) arrConverter.push("*")
+                arrConverter.push(Math.E)
                 idx++
             }
-            if(idx<str.length && !this.#isNumber(str[idx])) {
+            if(idx<str.length && !this.#isNumber(str[idx]) && !this.#isCharacter(str[idx])) {
                 if(str[idx] === "(") {
-                    if(this.stack.length > 0 && (typeof this.stack[this.stack.length - 1] === "number")) this.stack.push("*")
+                    if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number")) arrConverter.push("*")
                     open++
                 } 
                 else if(str[idx] === ")") {
                     close++
                 }
-                this.stack.push(str[idx])
+                arrConverter.push(str[idx])
                 idx++
             }
+            // console.log(arrConverter);
+            
         }
         if(open != close) throw new Error("Invalid parantheses")
-        return this.stack
+        return arrConverter
     }
 
     postfix(arr) {
@@ -225,11 +262,11 @@ class Stack {
                 if(arr[idx] === "(") paran--
                 if(paran === 0) {
                     start = idx 
-                    console.log(start);
+                    // console.log(start);
                     
                     break
                 }
-                console.log(paran, start, arr[idx]);
+                // console.log(paran, start, arr[idx]);
                 idx--
                 
             }
