@@ -47,11 +47,11 @@ conatiner.addEventListener("click", function(e) {
         input.value += e.target.dataset.bracket
     } else if(type === "equal") {
         try {
-            console.log('before token');
+            // console.log('before token');
             
             const token = st.arrConvert(input.value)
             console.log(token);
-            console.log('after token');
+            // console.log('after token');
             
             const post = st.postfix(token)
             console.log(post);
