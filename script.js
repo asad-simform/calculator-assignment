@@ -38,8 +38,10 @@ conatiner.addEventListener("click", function(e) {
             case "res":
                 input.value = st.resiprocal(input.value) ?? "Can't divide by zero"
                 break
-                
-
+            case "toggle":
+            const token = st.arrConvert(input.value)
+            const newInput = st.toggleSign(token)
+            input.value = newInput.join('')
         }
     } else if(type === "bracket") {
         input.value += e.target.dataset.bracket
