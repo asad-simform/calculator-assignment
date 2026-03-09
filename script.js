@@ -1,47 +1,22 @@
 import { Stack } from "./stack.js";
+import { History } from "./history.js"; 
 
 const conatiner = document.getElementsByClassName("grid-container")[0];
 const input = document.getElementsByTagName("input")[0]
-const calHistory = document.getElementsByClassName("cal-history")[0]
-const clearBtn = document.getElementsByClassName("clear-his")[0]
+
 
 const st = new Stack()
+const hs = new History()
 
 
 
-function appendHistory(expression, res) {
-    const div = document.createElement('div')
-    div.classList.add("history-div")
-    const textNode = document.createTextNode(`${expression} = ${res}`)
-    div.append(textNode)
-    calHistory.prepend(div)
-    if(!localStorage.getItem("calculator")) {
-        localStorage.setItem("calculator", JSON.stringify([{expression, res}]))
-    } else {
-        const arr = JSON.parse(localStorage.getItem("calculator"))
-        arr.unshift({expression, res})
-        localStorage.setItem("calculator", JSON.stringify(arr))
-    }
-    
-}
 
-function loadLocal() {
-    if(localStorage.getItem("calculator")) {
-        const arr = JSON.parse(localStorage.getItem("calculator"))
-        for (const element of arr) {
-            const div = document.createElement('div')
-            div.classList.add("history-div")
-            const textNode = document.createTextNode(`${element.expression} = ${element.res}`)
-            div.append(textNode)
-            calHistory.append(div)
-        }
-    } 
-}
+
 
 function handleResiprocal() {
     let res = st.resiprocal(input.value) ?? "Can't divide by zero"
     if(typeof res !== "string") {
-        appendHistory(input.value, res)
+        hs.appendHistory(`1/(${input.value})`, res)
     }
     return res
 }
@@ -91,8 +66,8 @@ conatiner.addEventListener("click", function(e) {
             console.log(post);
             const res = st.evaluatePostfix(post)
             console.log(res);
-            appendHistory(input.value, res[0])
-            input.value = res[0]
+            hs.appendHistory(input.value, res[0].toFixed(2))
+            input.value = res[0].toFixed(2)
         } catch (error) {
             console.log(error);
             
@@ -101,11 +76,6 @@ conatiner.addEventListener("click", function(e) {
     }
 })
 
-clearBtn.addEventListener("click", () => {
-    if(localStorage.getItem("calculator")) {
-        localStorage.removeItem("calculator")
-        calHistory.replaceChildren()
-    }
-})
 
-loadLocal()
+
+hs.loadLocal()
