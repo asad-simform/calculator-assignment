@@ -21,9 +21,7 @@ class Stack {
         else return -1
     }
 
-    #scientificOperator(op, val) {
-        // console.log(Math.cos(val));
-        
+    #scientificOperator(op, val) {        
         switch(op) {
             case "sin": 
                 return Math.sin(val)
@@ -62,27 +60,23 @@ class Stack {
         return 1/res 
     }
 
-    arrConvert(str) {
-        console.log(str);
-        
+    arrConvert(str) {        
         let arrConverter = []
         let idx = 0
         let open = 0, close = 0;
-        while(idx < str.length) {   
+        while(idx < str.length) {  
             let num = ""
-            if(idx<str.length && ["+", "-"].includes(str[idx]) && (idx===0 || arrConverter[arrConverter.length - 1] === "(" || typeof arrConverter[arrConverter.length - 1] !== "number") && arrConverter[arrConverter.length - 1] !== "!"){
+            if(idx<str.length && ["+", "-"].includes(str[idx]) && (idx===0 || arrConverter[arrConverter.length - 1] === "(" || ["+", "-", "*", "/", "(", "^", "%"].includes(arrConverter[arrConverter.length - 1]) ) && arrConverter[arrConverter.length - 1] !== "!"){
                 let flag = false
                 let neg = str[idx]==="+" ? 1 : -1
-                // console.log(neg);
                 idx++
                 while(idx<str.length && !this.#isNumber(str[idx]) && ["+", "-"].includes(str[idx])) {
                     if(str[idx] === "-") neg *= -1
                     idx++
                 }
                 while(idx<str.length && this.#isNumber(str[idx])){
-                    console.log(flag);
-                    if(str[idx] === "." && !flag) flag = true
-                    else throw new Error("Multiple decimal point not allowed")
+                    if(str[idx]==="." && flag)throw new Error("Multiple decimal point not allowed")
+                    if(str[idx]==="." && !flag) flag = true
                     num += str[idx]
                     idx++;
                 }
@@ -94,8 +88,8 @@ class Stack {
             if (idx<str.length && this.#isNumber(str[idx])) {
                 let flag = false 
                 while (idx < str.length && this.#isNumber(str[idx])) {
+                    if(str[idx]==="." && flag)throw new Error("Multiple decimal point not allowed")
                     if(str[idx]==="." && !flag) flag = true
-                    else throw new Error("Multiple decimal point not allowed")
                     num += str[idx];
                     idx++;
                 }
@@ -134,36 +128,36 @@ class Stack {
                     evl += str[idx]
                     idx++
                 }
-                console.log(evl);
+                // console.log(evl);
                 
                 // while(idx+1<str.length && str[idx+1] !== ")") {
                 //     evl += str[idx+1]
                 //     idx++
                 // }
-                if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number")) arrConverter.push("*")
-                let number = this.evaluatePostfix(this.postfix(this.arrConvert(evl)))
+                if(paran === 0) {
+                    if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number")) arrConverter.push("*")
+                    let number = this.evaluatePostfix(this.postfix(this.arrConvert(evl)))
                     let result = this.#scientificOperator(num, number)
-                // console.log(result);
-                // console.log(number);
-                console.log(arrConverter);
-                
-                arrConverter.push(result)
+                     arrConverter.push(result)
+                } else {
+                    throw new Error("Invalid parantheses")
+                }
                 num = ""
-                idx+=2
+                idx++
             }
             if(idx<str.length && str[idx] === "π") {
-                if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number")) arrConverter.push("*")
+                if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number" || arrConverter[arrConverter.length - 1] === ")")) arrConverter.push("*")
                 arrConverter.push(Math.PI)
                 idx++
             }
             if(idx<str.length && str[idx] === "ℯ") {
-                if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number")) arrConverter.push("*")
+                if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number" || arrConverter[arrConverter.length - 1] === ")")) arrConverter.push("*")
                 arrConverter.push(Math.E)
                 idx++
             }
             if(idx<str.length && !this.#isNumber(str[idx]) && !this.#isCharacter(str[idx])) {
                 if(str[idx] === "(") {
-                    if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number")) arrConverter.push("*")
+                    if(arrConverter.length > 0 && (typeof arrConverter[arrConverter.length - 1] === "number" || arrConverter[arrConverter.length - 1] === ")")) arrConverter.push("*")
                     open++
                 } 
                 else if(str[idx] === ")") {
@@ -172,8 +166,6 @@ class Stack {
                 arrConverter.push(str[idx])
                 idx++
             }
-            // console.log(arrConverter);
-            
         }
         if(open != close) throw new Error("Invalid parantheses")
         return arrConverter
@@ -251,7 +243,7 @@ class Stack {
         let paran = -1
         let start = -1, end = -1
         let idx = arr.length - 1
-        if(arr.length === 0) return "Can't perform operation";
+        if(arr.length === 0) return "Can't perform operation";        
         if(typeof arr[arr.length - 1] === "number") {
             arr[arr.length - 1] = -1 * arr[arr.length - 1]
         } else {
@@ -269,20 +261,13 @@ class Stack {
                 if(arr[idx] === "(") paran--
                 if(paran === 0) {
                     start = idx 
-                    // console.log(start);
-                    
                     break
                 }
-                // console.log(paran, start, arr[idx]);
                 idx--
-                
             }
             if(start !== -1) {
                 arr[start] = "-("
             }
-            // if(paran === 0) start = idx+1 
-            // console.log(arr[start], arr[end], start, end, idx);
-            
         }
         return arr
     }
