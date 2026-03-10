@@ -57,3 +57,5 @@ calculator/
 ├─ history.js                
 └─ README.md        
 ```
+## Screenshot:
+![Calculator screenshot](./Screenshot%20from%202026-03-10%2009-51-27.png)
